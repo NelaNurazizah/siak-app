@@ -69,7 +69,7 @@ $role     = $_SESSION['role'];
             <!-- Menu Khusus Dosen -->
             <?php if ($role == 'dosen'): ?>
                 <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
+                    <a href="dosen_nilai.php" class="nav-link text-white">
                         <i class="bi bi-pencil-square me-2"></i> Input Nilai
                     </a>
                 </li>
