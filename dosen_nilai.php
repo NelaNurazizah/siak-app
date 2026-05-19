@@ -2,24 +2,49 @@
 session_start();
 require_once 'koneksi.php';
 
-// Proteksi: Hanya Dosen yang boleh mengakses
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'dosen') {
     header("Location: dashboard.php");
     exit;
 }
 
 $selected_mk = isset($_GET['kode_mk']) ? $_GET['kode_mk'] : '';
+$pesan = '';
+
+// 1. PROSES SIMPAN NILAI
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['simpan_nilai'])) {
+    foreach ($_POST['nilai_angka'] as $nim => $angka) {
+        $angka = (float)$angka;
+        
+        // Logika Konversi Nilai
+        if ($angka >= 80) $huruf = 'A';
+        elseif ($angka >= 70) $huruf = 'B';
+        elseif ($angka >= 60) $huruf = 'C';
+        elseif ($angka >= 50) $huruf = 'D';
+        else $huruf = 'E';
+
+        // Cek apakah data nilai sudah ada
+        $cek = mysqli_query($koneksi, "SELECT id FROM nilai WHERE nim = '$nim' AND kode_mk = '$selected_mk'");
+        
+        if (mysqli_num_rows($cek) > 0) {
+            // Update jika sudah ada
+            mysqli_query($koneksi, "UPDATE nilai SET nilai_angka = $angka, nilai_huruf = '$huruf' WHERE nim = '$nim' AND kode_mk = '$selected_mk'");
+        } else {
+            // Insert jika belum ada
+            mysqli_query($koneksi, "INSERT INTO nilai (nim, kode_mk, nilai_angka, nilai_huruf) VALUES ('$nim', '$selected_mk', $angka, '$huruf')");
+        }
+    }
+    $pesan = "Nilai berhasil disimpan dan dikonversi!";
+}
+
+// 2. MENGAMBIL DAFTAR PESERTA & NILAI (JIKA SUDAH ADA)
+$query_mk = mysqli_query($koneksi, "SELECT * FROM matakuliah");
 $daftar_mahasiswa = null;
 
-// Mengambil daftar semua mata kuliah untuk dropdown
-$query_mk = mysqli_query($koneksi, "SELECT * FROM matakuliah");
-
-// Jika Dosen menekan tombol Cari
 if ($selected_mk != '') {
-    // Join tabel krs dan mahasiswa untuk mendapatkan daftar peserta
-    $query_peserta = "SELECT m.nim, m.nama 
+    $query_peserta = "SELECT m.nim, m.nama, n.nilai_angka 
                       FROM krs k 
                       JOIN mahasiswa m ON k.nim = m.nim 
+                      LEFT JOIN nilai n ON k.nim = n.nim AND k.kode_mk = n.kode_mk
                       WHERE k.kode_mk = '$selected_mk'";
     $daftar_mahasiswa = mysqli_query($koneksi, $query_peserta);
 }
@@ -35,17 +60,13 @@ if ($selected_mk != '') {
 <body class="bg-light">
 
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Input Nilai Mahasiswa</h2>
-        <a href="dashboard.php" class="btn btn-secondary">Kembali</a>
-    </div>
+    <h2>Input Nilai Mahasiswa</h2>
+    <?php if ($pesan): ?><div class="alert alert-success"><?= $pesan; ?></div><?php endif; ?>
 
-    <!-- Filter Mata Kuliah -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <form action="" method="GET" class="row g-3 align-items-end">
-                <div class="col-md-8">
-                    <label class="form-label">Pilih Mata Kuliah</label>
+            <form action="" method="GET" class="row g-3">
+                <div class="col-md-10">
                     <select name="kode_mk" class="form-select" required>
                         <option value="">-- Pilih Mata Kuliah --</option>
                         <?php while ($mk = mysqli_fetch_assoc($query_mk)): ?>
@@ -55,47 +76,39 @@ if ($selected_mk != '') {
                         <?php endwhile; ?>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Cari</button>
-                </div>
+                <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Cari</button></div>
             </form>
         </div>
     </div>
 
-    <!-- Tabel Daftar Mahasiswa -->
     <?php if ($selected_mk != ''): ?>
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h5 class="mb-3">Daftar Mahasiswa Peserta</h5>
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>NIM</th>
-                        <th>Nama</th>
-                        <th>Nilai Angka (0-100)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($daftar_mahasiswa && mysqli_num_rows($daftar_mahasiswa) > 0): ?>
+    <form action="" method="POST">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr><th>NIM</th><th>Nama</th><th>Nilai (0-100)</th></tr>
+                    </thead>
+                    <tbody>
                         <?php while ($mhs = mysqli_fetch_assoc($daftar_mahasiswa)): ?>
                         <tr>
                             <td><?= $mhs['nim']; ?></td>
                             <td><?= $mhs['nama']; ?></td>
                             <td>
-                                <input type="number" class="form-control form-control-sm" style="width: 100px;" placeholder="0">
+                                <!-- Input array dengan key NIM -->
+                                <input type="number" name="nilai_angka[<?= $mhs['nim']; ?>]" 
+                                       class="form-control" value="<?= $mhs['nilai_angka'] ?? ''; ?>" 
+                                       min="0" max="100" required>
                             </td>
                         </tr>
                         <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr><td colspan="3" class="text-center">Tidak ada mahasiswa yang mengambil MK ini.</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-            <button class="btn btn-success">Simpan Semua Nilai</button>
+                    </tbody>
+                </table>
+                <button type="submit" name="simpan_nilai" class="btn btn-success">Simpan Nilai</button>
+            </div>
         </div>
-    </div>
+    </form>
     <?php endif; ?>
 </div>
-
 </body>
 </html>
