@@ -95,10 +95,12 @@ if ($selected_mk != '') {
                             <td><?= $mhs['nim']; ?></td>
                             <td><?= $mhs['nama']; ?></td>
                             <td>
-                                <!-- Input array dengan key NIM -->
-                                <input type="number" name="nilai_angka[<?= $mhs['nim']; ?>]" 
-                                       class="form-control" value="<?= $mhs['nilai_angka'] ?? ''; ?>" 
-                                       min="0" max="100" required>
+                                <input type="number" 
+                                       name="nilai_angka[<?= $mhs['nim']; ?>]" 
+                                       class="form-control" 
+                                       value="<?= $mhs['nilai_angka'] ?? ''; ?>" 
+                                       min="0" max="100" step="0.01" required 
+                                       oninput="if(this.value > 100) this.value = 100; if(this.value < 0) this.value = 0;">
                             </td>
                         </tr>
                         <?php endwhile; ?>

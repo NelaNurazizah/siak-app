@@ -17,11 +17,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
 
     // Mencari user di database
-    $query = "SELECT * FROM users WHERE username = '$username'";
-    $result = mysqli_query($koneksi, $query);
+    $stmt = $koneksi->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username); // "s" berarti variabel username bertipe string
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if (mysqli_num_rows($result) === 1) {
-        $user = mysqli_fetch_assoc($result);
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
         
         // Pengecekan password 
         // Catatan: Untuk testing ini kita menggunakan plain-text. 
@@ -120,5 +122,16 @@ INSERT INTO users (username, password, role) VALUES
 
 <!-- Bootstrap 5 JS Bundle via CDN (Opsional untuk interaktivitas komponen) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    
+    if (user === "" || pass === "") {
+        alert("Username dan Password tidak boleh kosong!");
+        e.preventDefault(); // Mencegah submit
+    }
+});
+</script>
 </body>
 </html>
