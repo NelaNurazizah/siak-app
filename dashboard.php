@@ -78,8 +78,13 @@ $role     = $_SESSION['role'];
             <!-- Menu Khusus Admin -->
             <?php if ($role == 'admin'): ?>
                 <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
-                        <i class="bi bi-database-gear me-2"></i> Kelola Data
+                    <a href="admin_data.php" class="nav-link text-white">
+                        <i class="bi bi-people me-2"></i> Kelola Pengguna
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="admin_mk.php" class="nav-link text-white">
+                        <i class="bi bi-book me-2"></i> Kelola Mata Kuliah
                     </a>
                 </li>
             <?php endif; ?>
