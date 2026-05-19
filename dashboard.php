@@ -60,7 +60,7 @@ $role     = $_SESSION['role'];
                     </a>
                 </li>
                 <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
+                    <a href="mahasiswa_khs.php" class="nav-link text-white">
                         <i class="bi bi-file-earmark-check me-2"></i> KHS
                     </a>
                 </li>
