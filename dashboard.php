@@ -55,7 +55,7 @@ $role     = $_SESSION['role'];
             <!-- Menu Khusus Mahasiswa -->
             <?php if ($role == 'mahasiswa'): ?>
                 <li class="nav-item mb-1">
-                    <a href="#" class="nav-link text-white">
+                    <a href="mahasiswa_krs.php" class="nav-link text-white">
                         <i class="bi bi-journal-text me-2"></i> KRS
                     </a>
                 </li>
