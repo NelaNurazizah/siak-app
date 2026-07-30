@@ -1,0 +1,100 @@
+/* =========================================================
+   assets/css/style.css
+   Style kustom untuk Sistem Informasi Akademik Sederhana
+   ========================================================= */
+
+:root {
+  --sia-primary: #4f46e5;
+  --sia-primary-dark: #3730a3;
+  --sia-bg-soft: #f4f5fb;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+/* ---------- Halaman Login ---------- */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--sia-primary) 0%, var(--sia-primary-dark) 100%);
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.login-card .card-header-custom {
+  background-color: #fff;
+  text-align: center;
+  padding: 32px 24px 8px 24px;
+}
+
+.login-card .card-header-custom .icon-circle {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px auto;
+  border-radius: 50%;
+  background: var(--sia-bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sia-primary);
+  font-size: 28px;
+}
+
+.login-card .card-body {
+  padding: 24px 32px 32px 32px;
+}
+
+.login-card .btn-login {
+  background-color: var(--sia-primary);
+  border-color: var(--sia-primary);
+  font-weight: 600;
+  padding: 10px;
+}
+
+.login-card .btn-login:hover {
+  background-color: var(--sia-primary-dark);
+  border-color: var(--sia-primary-dark);
+}
+
+.login-card .form-label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.toggle-password {
+  cursor: pointer;
+}
+
+/* ---------- Umum: Sidebar & Dashboard (dipakai mulai Tahap 6) ---------- */
+.sidebar {
+  min-height: 100vh;
+  background-color: #1e1b4b;
+}
+
+.sidebar .nav-link {
+  color: #c7c9f5;
+}
+
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.card-stat {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
