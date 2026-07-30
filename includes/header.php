@@ -12,6 +12,8 @@ if (!defined('APP_INIT')) {
     die('Akses langsung ke file ini tidak diizinkan.');
 }
 
+require_once __DIR__ . '/functions.php';
+
 $pageTitle = $pageTitle ?? 'Dashboard';
 ?>
 <!DOCTYPE html>
@@ -54,3 +56,10 @@ $pageTitle = $pageTitle ?? 'Dashboard';
         </nav>
 
         <main class="p-4">
+            <?php $flash = getFlash(); ?>
+            <?php if ($flash): ?>
+                <div class="alert alert-<?= htmlspecialchars($flash['type']) ?> alert-dismissible alert-auto-dismiss" role="alert">
+                    <?= htmlspecialchars($flash['message']) ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
