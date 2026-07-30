@@ -1,12 +1,12 @@
 <?php
 /**
  * dosen/nilai_proses.php
- * Menangani proses input nilai (create) oleh dosen.
- * Aksi 'update' (Edit Nilai) akan ditambahkan pada Tahap 16.
+ * Menangani proses input nilai (create) dan edit nilai (update) oleh dosen.
  *
- * Keamanan: setiap request diverifikasi bahwa krs_id yang dikirim
+ * Keamanan: setiap request diverifikasi bahwa krs_id/nilai_id yang dikirim
  * benar-benar berada pada kelas yang diampu oleh dosen yang login,
- * agar seorang dosen tidak bisa menilai mahasiswa di kelas dosen lain.
+ * agar seorang dosen tidak bisa menilai atau mengubah nilai mahasiswa
+ * di kelas dosen lain.
  */
 
 require_once __DIR__ . '/../config/config.php';
@@ -86,6 +86,55 @@ if ($action === 'create') {
     }
 
     redirectTo('dosen/input_nilai.php');
+}
+
+if ($action === 'update') {
+    $nilaiId    = (int) ($_POST['nilai_id'] ?? 0);
+    $nilaiAngka = $_POST['nilai_angka'] ?? '';
+
+    if ($nilaiId === 0 || $nilaiAngka === '' || !is_numeric($nilaiAngka) || $nilaiAngka < 0 || $nilaiAngka > 100) {
+        setFlash('danger', 'Nilai wajib diisi dengan angka antara 0-100.');
+        redirectTo('dosen/nilai.php');
+    }
+
+    $nilaiAngka = round((float) $nilaiAngka, 2);
+
+    try {
+        // Pastikan baris nilai ini milik mahasiswa di kelas yang diampu dosen yang login
+        $stmtCek = $db->prepare('
+            SELECT n.id
+            FROM nilai n
+            JOIN krs k ON k.id = n.krs_id
+            JOIN kelas kl ON kl.id = k.kelas_id
+            WHERE n.id = :nilai_id AND kl.dosen_id = :dosen_id
+        ');
+        $stmtCek->execute([':nilai_id' => $nilaiId, ':dosen_id' => $dosenId]);
+        if (!$stmtCek->fetch()) {
+            setFlash('danger', 'Data nilai tidak ditemukan atau bukan wewenang Anda.');
+            redirectTo('dosen/nilai.php');
+        }
+
+        [$nilaiHuruf, $bobot] = hitungNilaiHuruf($nilaiAngka);
+
+        $stmt = $db->prepare('
+            UPDATE nilai
+            SET nilai_angka = :nilai_angka, nilai_huruf = :nilai_huruf, bobot = :bobot
+            WHERE id = :id
+        ');
+        $stmt->execute([
+            ':nilai_angka' => $nilaiAngka,
+            ':nilai_huruf' => $nilaiHuruf,
+            ':bobot'       => $bobot,
+            ':id'          => $nilaiId,
+        ]);
+
+        setFlash('success', "Nilai berhasil diperbarui ($nilaiHuruf).");
+    } catch (PDOException $e) {
+        error_log('Update Nilai Error: ' . $e->getMessage());
+        setFlash('danger', 'Terjadi kesalahan saat memperbarui nilai.');
+    }
+
+    redirectTo('dosen/nilai.php');
 }
 
 setFlash('danger', 'Aksi tidak dikenali.');
