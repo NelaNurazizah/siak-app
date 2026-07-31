@@ -17,20 +17,36 @@ $db = Database::getConnection();
 
 $keyword = cleanInput($_GET['q'] ?? '');
 
+$perHalaman = 10;
+$halaman = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($halaman - 1) * $perHalaman;
+
+$whereClause = '';
+$params = [];
+if ($keyword !== '') {
+    $whereClause = ' WHERE d.nidn LIKE :keyword OR d.nama LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+
+$sqlCount = "SELECT COUNT(*) AS total FROM dosen d JOIN users u ON u.id = d.user_id" . $whereClause;
+$stmtCount = $db->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalData = (int) $stmtCount->fetch()['total'];
+$totalHalaman = (int) ceil($totalData / $perHalaman);
+
 $sql = "
     SELECT d.id, d.nidn, d.nama, d.jenis_kelamin, d.no_hp, d.alamat, u.username
     FROM dosen d
     JOIN users u ON u.id = d.user_id
-";
-$params = [];
-if ($keyword !== '') {
-    $sql .= ' WHERE d.nidn LIKE :keyword OR d.nama LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
-}
-$sql .= ' ORDER BY d.nama ASC';
+" . $whereClause . ' ORDER BY d.nama ASC LIMIT :limit OFFSET :offset';
 
 $stmt = $db->prepare($sql);
-$stmt->execute($params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->bindValue(':limit', $perHalaman, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $daftarDosen = $stmt->fetchAll();
 
 $pageTitle = 'Data Dosen';
@@ -79,7 +95,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php else: ?>
                         <?php foreach ($daftarDosen as $i => $d): ?>
                             <tr>
-                                <td><?= $i + 1 ?></td>
+                                <td><?= $offset + $i + 1 ?></td>
                                 <td><?= htmlspecialchars($d['nidn']) ?></td>
                                 <td><?= htmlspecialchars($d['nama']) ?></td>
                                 <td><?= $d['jenis_kelamin'] === 'L' ? 'Laki-laki' : 'Perempuan' ?></td>
@@ -109,6 +125,11 @@ require_once __DIR__ . '/../includes/header.php';
             </table>
         </div>
     </div>
+    <?php if ($totalHalaman > 1): ?>
+    <div class="card-footer bg-white">
+        <?= renderPagination($halaman, $totalHalaman, 'admin/dosen.php', $keyword !== '' ? ['q' => $keyword] : []) ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- Modal Tambah/Edit Dosen -->

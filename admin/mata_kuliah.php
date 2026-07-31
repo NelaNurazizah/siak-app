@@ -15,16 +15,31 @@ $db = Database::getConnection();
 
 $keyword = cleanInput($_GET['q'] ?? '');
 
-$sql = 'SELECT id, kode_mk, nama_mk, sks, semester FROM mata_kuliah';
+$perHalaman = 10;
+$halaman = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($halaman - 1) * $perHalaman;
+
+$whereClause = '';
 $params = [];
 if ($keyword !== '') {
-    $sql .= ' WHERE kode_mk LIKE :keyword OR nama_mk LIKE :keyword';
+    $whereClause = ' WHERE kode_mk LIKE :keyword OR nama_mk LIKE :keyword';
     $params[':keyword'] = '%' . $keyword . '%';
 }
-$sql .= ' ORDER BY semester ASC, nama_mk ASC';
+
+$stmtCount = $db->prepare('SELECT COUNT(*) AS total FROM mata_kuliah' . $whereClause);
+$stmtCount->execute($params);
+$totalData = (int) $stmtCount->fetch()['total'];
+$totalHalaman = (int) ceil($totalData / $perHalaman);
+
+$sql = 'SELECT id, kode_mk, nama_mk, sks, semester FROM mata_kuliah' . $whereClause . ' ORDER BY semester ASC, nama_mk ASC LIMIT :limit OFFSET :offset';
 
 $stmt = $db->prepare($sql);
-$stmt->execute($params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->bindValue(':limit', $perHalaman, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $daftarMatkul = $stmt->fetchAll();
 
 $pageTitle = 'Data Mata Kuliah';
@@ -73,7 +88,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php else: ?>
                         <?php foreach ($daftarMatkul as $i => $mk): ?>
                             <tr>
-                                <td><?= $i + 1 ?></td>
+                                <td><?= $offset + $i + 1 ?></td>
                                 <td><span class="badge bg-secondary"><?= htmlspecialchars($mk['kode_mk']) ?></span></td>
                                 <td><?= htmlspecialchars($mk['nama_mk']) ?></td>
                                 <td><?= (int) $mk['sks'] ?></td>
@@ -103,6 +118,11 @@ require_once __DIR__ . '/../includes/header.php';
             </table>
         </div>
     </div>
+    <?php if ($totalHalaman > 1): ?>
+    <div class="card-footer bg-white">
+        <?= renderPagination($halaman, $totalHalaman, 'admin/mata_kuliah.php', $keyword !== '' ? ['q' => $keyword] : []) ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- Modal Tambah/Edit Mata Kuliah -->

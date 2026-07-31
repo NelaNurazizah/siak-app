@@ -56,6 +56,52 @@ function cleanInput(string $value): string
 }
 
 /**
+ * Menghasilkan HTML navigasi pagination Bootstrap.
+ * Mempertahankan parameter pencarian (?q=) yang sedang aktif.
+ *
+ * @param int    $halamanSaatIni Halaman yang sedang aktif (mulai dari 1)
+ * @param int    $totalHalaman   Total jumlah halaman
+ * @param string $baseUrl        URL halaman (relatif terhadap BASE_URL), contoh: 'admin/mahasiswa.php'
+ * @param array  $queryParams    Parameter query tambahan yang perlu dipertahankan (contoh: ['q' => 'budi'])
+ */
+function renderPagination(int $halamanSaatIni, int $totalHalaman, string $baseUrl, array $queryParams = []): string
+{
+    if ($totalHalaman <= 1) {
+        return '';
+    }
+
+    $buatUrl = function (int $page) use ($baseUrl, $queryParams): string {
+        $queryParams['page'] = $page;
+        return BASE_URL . $baseUrl . '?' . http_build_query($queryParams);
+    };
+
+    $html = '<nav aria-label="Navigasi halaman"><ul class="pagination justify-content-center mb-0">';
+
+    // Tombol "Sebelumnya"
+    $disabledPrev = $halamanSaatIni <= 1 ? 'disabled' : '';
+    $html .= '<li class="page-item ' . $disabledPrev . '">
+        <a class="page-link" href="' . htmlspecialchars($buatUrl(max(1, $halamanSaatIni - 1))) . '">&laquo;</a>
+    </li>';
+
+    for ($i = 1; $i <= $totalHalaman; $i++) {
+        $active = $i === $halamanSaatIni ? 'active' : '';
+        $html .= '<li class="page-item ' . $active . '">
+            <a class="page-link" href="' . htmlspecialchars($buatUrl($i)) . '">' . $i . '</a>
+        </li>';
+    }
+
+    // Tombol "Berikutnya"
+    $disabledNext = $halamanSaatIni >= $totalHalaman ? 'disabled' : '';
+    $html .= '<li class="page-item ' . $disabledNext . '">
+        <a class="page-link" href="' . htmlspecialchars($buatUrl(min($totalHalaman, $halamanSaatIni + 1))) . '">&raquo;</a>
+    </li>';
+
+    $html .= '</ul></nav>';
+
+    return $html;
+}
+
+/**
  * Mengonversi nilai angka (0-100) menjadi nilai huruf dan bobot IPK,
  * sesuai skala penilaian yang ditetapkan pada proyek ini:
  *   A = 4.00 (85-100)   A- = 3.75 (80-84)   B+ = 3.50 (75-79)

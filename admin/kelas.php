@@ -16,6 +16,29 @@ $db = Database::getConnection();
 
 $keyword = cleanInput($_GET['q'] ?? '');
 
+$perHalaman = 10;
+$halaman = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($halaman - 1) * $perHalaman;
+
+$whereClause = '';
+$params = [];
+if ($keyword !== '') {
+    $whereClause = ' WHERE mk.nama_mk LIKE :keyword OR mk.kode_mk LIKE :keyword OR d.nama LIKE :keyword OR k.nama_kelas LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+
+$sqlCount = "
+    SELECT COUNT(*) AS total
+    FROM kelas k
+    JOIN mata_kuliah mk ON mk.id = k.mata_kuliah_id
+    JOIN dosen d ON d.id = k.dosen_id
+    JOIN tahun_akademik ta ON ta.id = k.tahun_akademik_id
+" . $whereClause;
+$stmtCount = $db->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalData = (int) $stmtCount->fetch()['total'];
+$totalHalaman = (int) ceil($totalData / $perHalaman);
+
 $sql = "
     SELECT k.id, k.nama_kelas, k.hari, k.jam, k.ruang, k.kuota,
            mk.id AS mata_kuliah_id, mk.kode_mk, mk.nama_mk,
@@ -25,16 +48,15 @@ $sql = "
     JOIN mata_kuliah mk ON mk.id = k.mata_kuliah_id
     JOIN dosen d ON d.id = k.dosen_id
     JOIN tahun_akademik ta ON ta.id = k.tahun_akademik_id
-";
-$params = [];
-if ($keyword !== '') {
-    $sql .= ' WHERE mk.nama_mk LIKE :keyword OR mk.kode_mk LIKE :keyword OR d.nama LIKE :keyword OR k.nama_kelas LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
-}
-$sql .= ' ORDER BY ta.tahun DESC, mk.nama_mk ASC';
+" . $whereClause . ' ORDER BY ta.tahun DESC, mk.nama_mk ASC LIMIT :limit OFFSET :offset';
 
 $stmt = $db->prepare($sql);
-$stmt->execute($params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->bindValue(':limit', $perHalaman, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $daftarKelas = $stmt->fetchAll();
 
 // Data untuk dropdown form
@@ -90,7 +112,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php else: ?>
                         <?php foreach ($daftarKelas as $i => $k): ?>
                             <tr>
-                                <td><?= $i + 1 ?></td>
+                                <td><?= $offset + $i + 1 ?></td>
                                 <td><span class="badge bg-primary"><?= htmlspecialchars($k['nama_kelas']) ?></span></td>
                                 <td><?= htmlspecialchars($k['kode_mk'] . ' - ' . $k['nama_mk']) ?></td>
                                 <td><?= htmlspecialchars($k['nama_dosen']) ?></td>
@@ -122,6 +144,11 @@ require_once __DIR__ . '/../includes/header.php';
             </table>
         </div>
     </div>
+    <?php if ($totalHalaman > 1): ?>
+    <div class="card-footer bg-white">
+        <?= renderPagination($halaman, $totalHalaman, 'admin/kelas.php', $keyword !== '' ? ['q' => $keyword] : []) ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- Modal Tambah/Edit Kelas -->

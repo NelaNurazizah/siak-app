@@ -20,6 +20,29 @@ $db = Database::getConnection();
 
 $keyword = cleanInput($_GET['q'] ?? '');
 
+$perHalaman = 10;
+$halaman = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($halaman - 1) * $perHalaman;
+
+$whereClause = '';
+$params = [];
+if ($keyword !== '') {
+    $whereClause = ' WHERE u.username LIKE :keyword OR a.nama LIKE :keyword OR d.nama LIKE :keyword OR m.nama LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+
+$sqlCount = "
+    SELECT COUNT(*) AS total
+    FROM users u
+    LEFT JOIN admin a ON a.user_id = u.id
+    LEFT JOIN dosen d ON d.user_id = u.id
+    LEFT JOIN mahasiswa m ON m.user_id = u.id
+" . $whereClause;
+$stmtCount = $db->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalData = (int) $stmtCount->fetch()['total'];
+$totalHalaman = (int) ceil($totalData / $perHalaman);
+
 $sql = "
     SELECT u.id, u.username, u.role, u.created_at,
            COALESCE(a.nama, d.nama, m.nama) AS nama
@@ -27,25 +50,16 @@ $sql = "
     LEFT JOIN admin a ON a.user_id = u.id
     LEFT JOIN dosen d ON d.user_id = u.id
     LEFT JOIN mahasiswa m ON m.user_id = u.id
-";
-$params = [];
-if ($keyword !== '') {
-    $sql .= ' WHERE u.username LIKE :keyword OR a.nama LIKE :keyword OR d.nama LIKE :keyword OR m.nama LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
-}
-$sql .= " ORDER BY FIELD(u.role, 'admin', 'dosen', 'mahasiswa'), nama ASC";
+" . $whereClause . " ORDER BY FIELD(u.role, 'admin', 'dosen', 'mahasiswa'), nama ASC LIMIT :limit OFFSET :offset";
 
 $stmt = $db->prepare($sql);
-$stmt->execute($params);
-$daftarUser = $stmt->fetchAll();
-
-// Hitung jumlah admin aktif (dipakai untuk mencegah admin terakhir dihapus)
-$jumlahAdmin = 0;
-foreach ($daftarUser as $u) {
-    if ($u['role'] === 'admin') {
-        $jumlahAdmin++;
-    }
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
 }
+$stmt->bindValue(':limit', $perHalaman, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$daftarUser = $stmt->fetchAll();
 
 $pageTitle = 'Kelola User';
 require_once __DIR__ . '/../includes/header.php';
@@ -94,7 +108,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <tbody>
                     <?php foreach ($daftarUser as $i => $u): ?>
                         <tr>
-                            <td><?= $i + 1 ?></td>
+                            <td><?= $offset + $i + 1 ?></td>
                             <td><?= htmlspecialchars($u['username']) ?></td>
                             <td><?= htmlspecialchars($u['nama'] ?? '-') ?></td>
                             <td>
@@ -136,6 +150,11 @@ require_once __DIR__ . '/../includes/header.php';
             </table>
         </div>
     </div>
+    <?php if ($totalHalaman > 1): ?>
+    <div class="card-footer bg-white">
+        <?= renderPagination($halaman, $totalHalaman, 'admin/user.php', $keyword !== '' ? ['q' => $keyword] : []) ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- Modal Tambah Admin -->

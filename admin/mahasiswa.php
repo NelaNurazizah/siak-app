@@ -18,21 +18,39 @@ $db = Database::getConnection();
 // Ambil kata kunci pencarian dari query string (?q=...)
 $keyword = cleanInput($_GET['q'] ?? '');
 
+// Pengaturan pagination
+$perHalaman = 10;
+$halaman = max(1, (int) ($_GET['page'] ?? 1));
+$offset = ($halaman - 1) * $perHalaman;
+
+$whereClause = '';
+$params = [];
+if ($keyword !== '') {
+    $whereClause = ' WHERE m.nim LIKE :keyword OR m.nama LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+
+// Hitung total data (untuk keperluan pagination)
+$sqlCount = "SELECT COUNT(*) AS total FROM mahasiswa m JOIN users u ON u.id = m.user_id" . $whereClause;
+$stmtCount = $db->prepare($sqlCount);
+$stmtCount->execute($params);
+$totalData = (int) $stmtCount->fetch()['total'];
+$totalHalaman = (int) ceil($totalData / $perHalaman);
+
 // Ambil data mahasiswa beserta username-nya, difilter oleh kata kunci pencarian (NIM/Nama) jika ada
 $sql = "
     SELECT m.id, m.nim, m.nama, m.jenis_kelamin, m.angkatan, m.no_hp, m.alamat, u.username
     FROM mahasiswa m
     JOIN users u ON u.id = m.user_id
-";
-$params = [];
-if ($keyword !== '') {
-    $sql .= ' WHERE m.nim LIKE :keyword OR m.nama LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
-}
-$sql .= ' ORDER BY m.nama ASC';
+" . $whereClause . ' ORDER BY m.nama ASC LIMIT :limit OFFSET :offset';
 
 $stmt = $db->prepare($sql);
-$stmt->execute($params);
+foreach ($params as $key => $value) {
+    $stmt->bindValue($key, $value);
+}
+$stmt->bindValue(':limit', $perHalaman, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
 $daftarMahasiswa = $stmt->fetchAll();
 
 $pageTitle = 'Data Mahasiswa';
@@ -82,7 +100,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php else: ?>
                         <?php foreach ($daftarMahasiswa as $i => $m): ?>
                             <tr>
-                                <td><?= $i + 1 ?></td>
+                                <td><?= $offset + $i + 1 ?></td>
                                 <td><?= htmlspecialchars($m['nim']) ?></td>
                                 <td><?= htmlspecialchars($m['nama']) ?></td>
                                 <td><?= $m['jenis_kelamin'] === 'L' ? 'Laki-laki' : 'Perempuan' ?></td>
@@ -113,6 +131,11 @@ require_once __DIR__ . '/../includes/header.php';
             </table>
         </div>
     </div>
+    <?php if ($totalHalaman > 1): ?>
+    <div class="card-footer bg-white">
+        <?= renderPagination($halaman, $totalHalaman, 'admin/mahasiswa.php', $keyword !== '' ? ['q' => $keyword] : []) ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- Modal Tambah/Edit Mahasiswa -->
