@@ -9,29 +9,53 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 requireRole('admin');
 
 $db = Database::getConnection();
 
-$stmt = $db->query("
+$keyword = cleanInput($_GET['q'] ?? '');
+
+$sql = "
     SELECT d.id, d.nidn, d.nama, d.jenis_kelamin, d.no_hp, d.alamat, u.username
     FROM dosen d
     JOIN users u ON u.id = d.user_id
-    ORDER BY d.nama ASC
-");
+";
+$params = [];
+if ($keyword !== '') {
+    $sql .= ' WHERE d.nidn LIKE :keyword OR d.nama LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+$sql .= ' ORDER BY d.nama ASC';
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
 $daftarDosen = $stmt->fetchAll();
 
 $pageTitle = 'Data Dosen';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h5 class="fw-bold mb-0">Data Dosen</h5>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDosen" onclick="bukaModalTambah()">
         <i class="bi bi-plus-lg me-1"></i> Tambah Dosen
     </button>
 </div>
+
+<form action="" method="GET" class="mb-3">
+    <div class="input-group" style="max-width: 350px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control" placeholder="Cari NIDN atau nama..." value="<?= htmlspecialchars($keyword) ?>">
+        <?php if ($keyword !== ''): ?>
+            <a href="<?= BASE_URL ?>admin/dosen.php" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        <?php endif; ?>
+        <button type="submit" class="btn btn-outline-primary">Cari</button>
+    </div>
+</form>
 
 <div class="card card-stat">
     <div class="card-body p-0">

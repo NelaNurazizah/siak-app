@@ -7,24 +7,49 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 requireRole('admin');
 
 $db = Database::getConnection();
 
-$stmt = $db->query('SELECT id, kode_mk, nama_mk, sks, semester FROM mata_kuliah ORDER BY semester ASC, nama_mk ASC');
+$keyword = cleanInput($_GET['q'] ?? '');
+
+$sql = 'SELECT id, kode_mk, nama_mk, sks, semester FROM mata_kuliah';
+$params = [];
+if ($keyword !== '') {
+    $sql .= ' WHERE kode_mk LIKE :keyword OR nama_mk LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+$sql .= ' ORDER BY semester ASC, nama_mk ASC';
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
 $daftarMatkul = $stmt->fetchAll();
 
 $pageTitle = 'Data Mata Kuliah';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h5 class="fw-bold mb-0">Data Mata Kuliah</h5>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMatkul" onclick="bukaModalTambah()">
         <i class="bi bi-plus-lg me-1"></i> Tambah Mata Kuliah
     </button>
 </div>
+
+<form action="" method="GET" class="mb-3">
+    <div class="input-group" style="max-width: 350px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control" placeholder="Cari kode atau nama MK..." value="<?= htmlspecialchars($keyword) ?>">
+        <?php if ($keyword !== ''): ?>
+            <a href="<?= BASE_URL ?>admin/mata_kuliah.php" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        <?php endif; ?>
+        <button type="submit" class="btn btn-outline-primary">Cari</button>
+    </div>
+</form>
 
 <div class="card card-stat">
     <div class="card-body p-0">

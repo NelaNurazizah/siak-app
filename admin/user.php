@@ -12,20 +12,31 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 requireRole('admin');
 
 $db = Database::getConnection();
 
-$stmt = $db->query("
+$keyword = cleanInput($_GET['q'] ?? '');
+
+$sql = "
     SELECT u.id, u.username, u.role, u.created_at,
            COALESCE(a.nama, d.nama, m.nama) AS nama
     FROM users u
     LEFT JOIN admin a ON a.user_id = u.id
     LEFT JOIN dosen d ON d.user_id = u.id
     LEFT JOIN mahasiswa m ON m.user_id = u.id
-    ORDER BY FIELD(u.role, 'admin', 'dosen', 'mahasiswa'), nama ASC
-");
+";
+$params = [];
+if ($keyword !== '') {
+    $sql .= ' WHERE u.username LIKE :keyword OR a.nama LIKE :keyword OR d.nama LIKE :keyword OR m.nama LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+$sql .= " ORDER BY FIELD(u.role, 'admin', 'dosen', 'mahasiswa'), nama ASC";
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
 $daftarUser = $stmt->fetchAll();
 
 // Hitung jumlah admin aktif (dipakai untuk mencegah admin terakhir dihapus)
@@ -40,12 +51,25 @@ $pageTitle = 'Kelola User';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h5 class="fw-bold mb-0">Kelola User</h5>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUser">
         <i class="bi bi-plus-lg me-1"></i> Tambah Admin
     </button>
 </div>
+
+<form action="" method="GET" class="mb-3">
+    <div class="input-group" style="max-width: 350px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control" placeholder="Cari username atau nama..." value="<?= htmlspecialchars($keyword) ?>">
+        <?php if ($keyword !== ''): ?>
+            <a href="<?= BASE_URL ?>admin/user.php" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        <?php endif; ?>
+        <button type="submit" class="btn btn-outline-primary">Cari</button>
+    </div>
+</form>
 
 <div class="alert alert-info small">
     <i class="bi bi-info-circle me-1"></i>

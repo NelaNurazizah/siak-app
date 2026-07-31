@@ -9,30 +9,55 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 requireRole('admin');
 
 $db = Database::getConnection();
 
-// Ambil seluruh data mahasiswa beserta username-nya
-$stmt = $db->query("
+// Ambil kata kunci pencarian dari query string (?q=...)
+$keyword = cleanInput($_GET['q'] ?? '');
+
+// Ambil data mahasiswa beserta username-nya, difilter oleh kata kunci pencarian (NIM/Nama) jika ada
+$sql = "
     SELECT m.id, m.nim, m.nama, m.jenis_kelamin, m.angkatan, m.no_hp, m.alamat, u.username
     FROM mahasiswa m
     JOIN users u ON u.id = m.user_id
-    ORDER BY m.nama ASC
-");
+";
+$params = [];
+if ($keyword !== '') {
+    $sql .= ' WHERE m.nim LIKE :keyword OR m.nama LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+$sql .= ' ORDER BY m.nama ASC';
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
 $daftarMahasiswa = $stmt->fetchAll();
 
 $pageTitle = 'Data Mahasiswa';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h5 class="fw-bold mb-0">Data Mahasiswa</h5>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalMahasiswa" onclick="bukaModalTambah()">
         <i class="bi bi-plus-lg me-1"></i> Tambah Mahasiswa
     </button>
 </div>
+
+<form action="" method="GET" class="mb-3">
+    <div class="input-group" style="max-width: 350px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control" placeholder="Cari NIM atau nama..." value="<?= htmlspecialchars($keyword) ?>">
+        <?php if ($keyword !== ''): ?>
+            <a href="<?= BASE_URL ?>admin/mahasiswa.php" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        <?php endif; ?>
+        <button type="submit" class="btn btn-outline-primary">Cari</button>
+    </div>
+</form>
 
 <div class="card card-stat">
     <div class="card-body p-0">

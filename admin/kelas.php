@@ -8,12 +8,15 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 requireRole('admin');
 
 $db = Database::getConnection();
 
-$stmt = $db->query("
+$keyword = cleanInput($_GET['q'] ?? '');
+
+$sql = "
     SELECT k.id, k.nama_kelas, k.hari, k.jam, k.ruang, k.kuota,
            mk.id AS mata_kuliah_id, mk.kode_mk, mk.nama_mk,
            d.id AS dosen_id, d.nama AS nama_dosen,
@@ -22,8 +25,16 @@ $stmt = $db->query("
     JOIN mata_kuliah mk ON mk.id = k.mata_kuliah_id
     JOIN dosen d ON d.id = k.dosen_id
     JOIN tahun_akademik ta ON ta.id = k.tahun_akademik_id
-    ORDER BY ta.tahun DESC, mk.nama_mk ASC
-");
+";
+$params = [];
+if ($keyword !== '') {
+    $sql .= ' WHERE mk.nama_mk LIKE :keyword OR mk.kode_mk LIKE :keyword OR d.nama LIKE :keyword OR k.nama_kelas LIKE :keyword';
+    $params[':keyword'] = '%' . $keyword . '%';
+}
+$sql .= ' ORDER BY ta.tahun DESC, mk.nama_mk ASC';
+
+$stmt = $db->prepare($sql);
+$stmt->execute($params);
 $daftarKelas = $stmt->fetchAll();
 
 // Data untuk dropdown form
@@ -35,12 +46,25 @@ $pageTitle = 'Data Kelas';
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h5 class="fw-bold mb-0">Data Kelas</h5>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalKelas" onclick="bukaModalTambah()">
         <i class="bi bi-plus-lg me-1"></i> Tambah Kelas
     </button>
 </div>
+
+<form action="" method="GET" class="mb-3">
+    <div class="input-group" style="max-width: 350px;">
+        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+        <input type="text" name="q" class="form-control" placeholder="Cari mata kuliah, dosen, atau kelas..." value="<?= htmlspecialchars($keyword) ?>">
+        <?php if ($keyword !== ''): ?>
+            <a href="<?= BASE_URL ?>admin/kelas.php" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        <?php endif; ?>
+        <button type="submit" class="btn btn-outline-primary">Cari</button>
+    </div>
+</form>
 
 <div class="card card-stat">
     <div class="card-body p-0">
