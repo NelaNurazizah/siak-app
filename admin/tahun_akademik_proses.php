@@ -36,6 +36,11 @@ if ($action === 'create') {
         setFlash('danger', 'Tahun dan semester wajib diisi dengan benar.');
         redirectTo('admin/tahun_akademik.php');
     }
+
+    if (!isValidTahunAkademik($tahun)) {
+        setFlash('danger', 'Format tahun tidak valid. Gunakan format seperti 2025/2026.');
+        redirectTo('admin/tahun_akademik.php');
+    }
     if (!in_array($status, ['aktif', 'nonaktif'], true)) {
         $status = 'nonaktif';
     }
@@ -77,6 +82,11 @@ if ($action === 'create') {
 
     if ($id === 0 || $tahun === '' || !in_array($semester, ['Ganjil', 'Genap'], true)) {
         setFlash('danger', 'Tahun dan semester wajib diisi dengan benar.');
+        redirectTo('admin/tahun_akademik.php');
+    }
+
+    if (!isValidTahunAkademik($tahun)) {
+        setFlash('danger', 'Format tahun tidak valid. Gunakan format seperti 2025/2026.');
         redirectTo('admin/tahun_akademik.php');
     }
     if (!in_array($status, ['aktif', 'nonaktif'], true)) {

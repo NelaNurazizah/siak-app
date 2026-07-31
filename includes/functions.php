@@ -102,6 +102,62 @@ function renderPagination(int $halamanSaatIni, int $totalHalaman, string $baseUr
 }
 
 /**
+ * Kumpulan helper validasi format input, dipakai di berbagai proses CRUD
+ * untuk memastikan data yang masuk ke database benar-benar sesuai format
+ * yang diharapkan (bukan hanya "tidak kosong").
+ */
+
+/**
+ * Memvalidasi NIM/NIDN/Kode: hanya boleh huruf, angka, dan tanda hubung (-),
+ * panjang 3-20 karakter.
+ */
+function isValidKode(string $value): bool
+{
+    return (bool) preg_match('/^[A-Za-z0-9\-]{3,20}$/', $value);
+}
+
+/**
+ * Memvalidasi nomor HP: hanya boleh angka, spasi, dan tanda +, panjang 9-15 digit.
+ * Field ini opsional, jadi string kosong dianggap valid (biar dicek terpisah oleh pemanggil).
+ */
+function isValidNoHp(string $value): bool
+{
+    if ($value === '') {
+        return true;
+    }
+    return (bool) preg_match('/^\+?[0-9\s\-]{9,15}$/', $value);
+}
+
+/**
+ * Memvalidasi format username: huruf, angka, titik, dan underscore saja,
+ * tanpa spasi, panjang 3-50 karakter.
+ */
+function isValidUsername(string $value): bool
+{
+    return (bool) preg_match('/^[A-Za-z0-9._]{3,50}$/', $value);
+}
+
+/**
+ * Memvalidasi format tahun akademik, contoh yang valid: "2025/2026".
+ */
+function isValidTahunAkademik(string $value): bool
+{
+    return (bool) preg_match('/^\d{4}\/\d{4}$/', $value);
+}
+
+/**
+ * Memvalidasi format jam kelas, contoh yang valid: "08:00-10:30".
+ * Field ini opsional.
+ */
+function isValidJam(string $value): bool
+{
+    if ($value === '') {
+        return true;
+    }
+    return (bool) preg_match('/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/', $value);
+}
+
+/**
  * Mengonversi nilai angka (0-100) menjadi nilai huruf dan bobot IPK,
  * sesuai skala penilaian yang ditetapkan pada proyek ini:
  *   A = 4.00 (85-100)   A- = 3.75 (80-84)   B+ = 3.50 (75-79)

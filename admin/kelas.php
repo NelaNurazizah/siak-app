@@ -218,7 +218,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label">Jam</label>
-                            <input type="text" name="jam" id="kelas_jam" class="form-control" placeholder="08:00-10:30">
+                            <input type="text" name="jam" id="kelas_jam" class="form-control" placeholder="08:00-10:30" pattern="([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d" title="Format: 08:00-10:30">
                         </div>
                     </div>
 

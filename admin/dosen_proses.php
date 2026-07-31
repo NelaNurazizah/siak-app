@@ -41,6 +41,16 @@ if ($action === 'create') {
         redirectTo('admin/dosen.php');
     }
 
+    if (!isValidKode($nidn)) {
+        setFlash('danger', 'Format NIDN tidak valid. Gunakan huruf/angka, 3-20 karakter.');
+        redirectTo('admin/dosen.php');
+    }
+
+    if (!isValidNoHp($noHp)) {
+        setFlash('danger', 'Format No. HP tidak valid.');
+        redirectTo('admin/dosen.php');
+    }
+
     if (!in_array($jk, ['L', 'P'], true)) {
         $jk = 'L';
     }
@@ -94,6 +104,16 @@ if ($action === 'create') {
 
     if ($id === 0 || $nidn === '' || $nama === '') {
         setFlash('danger', 'Data tidak lengkap.');
+        redirectTo('admin/dosen.php');
+    }
+
+    if (!isValidKode($nidn)) {
+        setFlash('danger', 'Format NIDN tidak valid. Gunakan huruf/angka, 3-20 karakter.');
+        redirectTo('admin/dosen.php');
+    }
+
+    if (!isValidNoHp($noHp)) {
+        setFlash('danger', 'Format No. HP tidak valid.');
         redirectTo('admin/dosen.php');
     }
 

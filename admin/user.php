@@ -178,8 +178,8 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="mb-3">
                         <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required maxlength="50">
-                        <div class="invalid-feedback">Username wajib diisi.</div>
+                        <input type="text" name="username" class="form-control" required maxlength="50" pattern="[A-Za-z0-9._]{3,50}" title="Huruf, angka, titik, atau underscore, tanpa spasi">
+                        <div class="invalid-feedback">Username wajib diisi (huruf/angka/titik/underscore, tanpa spasi).</div>
                     </div>
 
                     <div class="mb-3">

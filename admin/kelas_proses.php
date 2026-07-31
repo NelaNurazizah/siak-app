@@ -50,6 +50,15 @@ function ambilInputKelas(): ?array
         return null;
     }
 
+    $hariValid = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    if (!in_array($data['hari'], $hariValid, true)) {
+        return null;
+    }
+
+    if (!isValidJam($data['jam'])) {
+        return null;
+    }
+
     return $data;
 }
 

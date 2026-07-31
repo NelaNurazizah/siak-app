@@ -148,8 +148,8 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="mb-3">
                         <label class="form-label">NIDN</label>
-                        <input type="text" name="nidn" id="dosen_nidn" class="form-control" required maxlength="20">
-                        <div class="invalid-feedback">NIDN wajib diisi.</div>
+                        <input type="text" name="nidn" id="dosen_nidn" class="form-control" required maxlength="20" pattern="[A-Za-z0-9\-]{3,20}">
+                        <div class="invalid-feedback">NIDN wajib diisi (huruf/angka, 3-20 karakter).</div>
                     </div>
 
                     <div class="mb-3">
@@ -168,7 +168,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="mb-3">
                         <label class="form-label">No. HP</label>
-                        <input type="text" name="no_hp" id="dosen_hp" class="form-control" maxlength="20">
+                        <input type="text" name="no_hp" id="dosen_hp" class="form-control" maxlength="20" pattern="\+?[0-9\s\-]{9,15}" title="Contoh: 081234567890">
                     </div>
 
                     <div class="mb-3">

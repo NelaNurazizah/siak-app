@@ -41,6 +41,21 @@ if ($action === 'create') {
         redirectTo('admin/mahasiswa.php');
     }
 
+    if (!isValidKode($nim)) {
+        setFlash('danger', 'Format NIM tidak valid. Gunakan huruf/angka, 3-20 karakter.');
+        redirectTo('admin/mahasiswa.php');
+    }
+
+    if (!isValidNoHp($noHp)) {
+        setFlash('danger', 'Format No. HP tidak valid.');
+        redirectTo('admin/mahasiswa.php');
+    }
+
+    if ($angkatan < 2000 || $angkatan > 2100) {
+        setFlash('danger', 'Angkatan tidak valid.');
+        redirectTo('admin/mahasiswa.php');
+    }
+
     if (!in_array($jk, ['L', 'P'], true)) {
         $jk = 'L';
     }
@@ -99,6 +114,16 @@ if ($action === 'create') {
 
     if ($id === 0 || $nim === '' || $nama === '' || $angkatan === 0) {
         setFlash('danger', 'Data tidak lengkap.');
+        redirectTo('admin/mahasiswa.php');
+    }
+
+    if (!isValidKode($nim)) {
+        setFlash('danger', 'Format NIM tidak valid. Gunakan huruf/angka, 3-20 karakter.');
+        redirectTo('admin/mahasiswa.php');
+    }
+
+    if (!isValidNoHp($noHp)) {
+        setFlash('danger', 'Format No. HP tidak valid.');
         redirectTo('admin/mahasiswa.php');
     }
 

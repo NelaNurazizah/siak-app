@@ -33,6 +33,11 @@ if ($action === 'create_admin') {
         redirectTo('admin/user.php');
     }
 
+    if (!isValidUsername($username)) {
+        setFlash('danger', 'Format username tidak valid. Gunakan huruf, angka, titik, atau underscore (3-50 karakter, tanpa spasi).');
+        redirectTo('admin/user.php');
+    }
+
     try {
         $db->beginTransaction();
 

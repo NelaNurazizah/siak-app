@@ -34,6 +34,16 @@ if ($action === 'create') {
         redirectTo('admin/mata_kuliah.php');
     }
 
+    if (!isValidKode($kodeMk)) {
+        setFlash('danger', 'Format kode mata kuliah tidak valid. Gunakan huruf/angka, 3-20 karakter.');
+        redirectTo('admin/mata_kuliah.php');
+    }
+
+    if ($sks > 6 || $semester > 8) {
+        setFlash('danger', 'SKS maksimal 6 dan semester maksimal 8.');
+        redirectTo('admin/mata_kuliah.php');
+    }
+
     try {
         $cek = $db->prepare('SELECT id FROM mata_kuliah WHERE kode_mk = :kode');
         $cek->execute([':kode' => $kodeMk]);
@@ -67,6 +77,16 @@ if ($action === 'create') {
 
     if ($id === 0 || $kodeMk === '' || $namaMk === '' || $sks < 1 || $semester < 1) {
         setFlash('danger', 'Semua field wajib diisi dengan benar.');
+        redirectTo('admin/mata_kuliah.php');
+    }
+
+    if (!isValidKode($kodeMk)) {
+        setFlash('danger', 'Format kode mata kuliah tidak valid. Gunakan huruf/angka, 3-20 karakter.');
+        redirectTo('admin/mata_kuliah.php');
+    }
+
+    if ($sks > 6 || $semester > 8) {
+        setFlash('danger', 'SKS maksimal 6 dan semester maksimal 8.');
         redirectTo('admin/mata_kuliah.php');
     }
 

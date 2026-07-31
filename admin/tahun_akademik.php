@@ -101,8 +101,8 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="mb-3">
                         <label class="form-label">Tahun</label>
-                        <input type="text" name="tahun" id="tahun_tahun" class="form-control" required maxlength="20" placeholder="Contoh: 2025/2026">
-                        <div class="invalid-feedback">Tahun wajib diisi.</div>
+                        <input type="text" name="tahun" id="tahun_tahun" class="form-control" required maxlength="20" placeholder="Contoh: 2025/2026" pattern="\d{4}/\d{4}">
+                        <div class="invalid-feedback">Format tahun harus seperti 2025/2026.</div>
                     </div>
 
                     <div class="mb-3">

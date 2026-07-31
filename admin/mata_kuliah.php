@@ -141,8 +141,8 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="mb-3">
                         <label class="form-label">Kode Mata Kuliah</label>
-                        <input type="text" name="kode_mk" id="matkul_kode" class="form-control" required maxlength="20">
-                        <div class="invalid-feedback">Kode mata kuliah wajib diisi.</div>
+                        <input type="text" name="kode_mk" id="matkul_kode" class="form-control" required maxlength="20" pattern="[A-Za-z0-9\-]{3,20}">
+                        <div class="invalid-feedback">Kode mata kuliah wajib diisi (huruf/angka, 3-20 karakter).</div>
                     </div>
 
                     <div class="mb-3">
