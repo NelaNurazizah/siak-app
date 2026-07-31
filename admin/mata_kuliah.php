@@ -22,14 +22,21 @@ $offset = ($halaman - 1) * $perHalaman;
 $whereClause = '';
 $params = [];
 if ($keyword !== '') {
-    $whereClause = ' WHERE kode_mk LIKE :keyword OR nama_mk LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
+    // Bug fix: nama parameter unik untuk setiap placeholder (lihat catatan di admin/mahasiswa.php)
+    $whereClause = ' WHERE kode_mk LIKE :keyword1 OR nama_mk LIKE :keyword2';
+    $params[':keyword1'] = '%' . $keyword . '%';
+    $params[':keyword2'] = '%' . $keyword . '%';
 }
 
 $stmtCount = $db->prepare('SELECT COUNT(*) AS total FROM mata_kuliah' . $whereClause);
 $stmtCount->execute($params);
 $totalData = (int) $stmtCount->fetch()['total'];
 $totalHalaman = (int) ceil($totalData / $perHalaman);
+
+if ($totalHalaman > 0 && $halaman > $totalHalaman) {
+    $halaman = $totalHalaman;
+    $offset = ($halaman - 1) * $perHalaman;
+}
 
 $sql = 'SELECT id, kode_mk, nama_mk, sks, semester FROM mata_kuliah' . $whereClause . ' ORDER BY semester ASC, nama_mk ASC LIMIT :limit OFFSET :offset';
 

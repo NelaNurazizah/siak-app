@@ -23,8 +23,12 @@ $offset = ($halaman - 1) * $perHalaman;
 $whereClause = '';
 $params = [];
 if ($keyword !== '') {
-    $whereClause = ' WHERE mk.nama_mk LIKE :keyword OR mk.kode_mk LIKE :keyword OR d.nama LIKE :keyword OR k.nama_kelas LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
+    // Bug fix: nama parameter unik untuk setiap placeholder (lihat catatan di admin/mahasiswa.php)
+    $whereClause = ' WHERE mk.nama_mk LIKE :keyword1 OR mk.kode_mk LIKE :keyword2 OR d.nama LIKE :keyword3 OR k.nama_kelas LIKE :keyword4';
+    $params[':keyword1'] = '%' . $keyword . '%';
+    $params[':keyword2'] = '%' . $keyword . '%';
+    $params[':keyword3'] = '%' . $keyword . '%';
+    $params[':keyword4'] = '%' . $keyword . '%';
 }
 
 $sqlCount = "
@@ -38,6 +42,11 @@ $stmtCount = $db->prepare($sqlCount);
 $stmtCount->execute($params);
 $totalData = (int) $stmtCount->fetch()['total'];
 $totalHalaman = (int) ceil($totalData / $perHalaman);
+
+if ($totalHalaman > 0 && $halaman > $totalHalaman) {
+    $halaman = $totalHalaman;
+    $offset = ($halaman - 1) * $perHalaman;
+}
 
 $sql = "
     SELECT k.id, k.nama_kelas, k.hari, k.jam, k.ruang, k.kuota,

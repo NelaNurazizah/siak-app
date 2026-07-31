@@ -26,8 +26,13 @@ $offset = ($halaman - 1) * $perHalaman;
 $whereClause = '';
 $params = [];
 if ($keyword !== '') {
-    $whereClause = ' WHERE m.nim LIKE :keyword OR m.nama LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
+    // Bug fix: gunakan nama parameter yang berbeda untuk tiap placeholder meskipun
+    // nilainya sama. Native prepared statement PDO (ATTR_EMULATE_PREPARES => false)
+    // tidak selalu mendukung parameter bernama yang sama dipakai berulang kali
+    // dalam satu query yang sama.
+    $whereClause = ' WHERE m.nim LIKE :keyword1 OR m.nama LIKE :keyword2';
+    $params[':keyword1'] = '%' . $keyword . '%';
+    $params[':keyword2'] = '%' . $keyword . '%';
 }
 
 // Hitung total data (untuk keperluan pagination)
@@ -36,6 +41,13 @@ $stmtCount = $db->prepare($sqlCount);
 $stmtCount->execute($params);
 $totalData = (int) $stmtCount->fetch()['total'];
 $totalHalaman = (int) ceil($totalData / $perHalaman);
+
+// Bug fix: jika halaman yang diminta melebihi total halaman (misal setelah data dihapus,
+// atau URL/bookmark sudah kedaluwarsa), turunkan ke halaman terakhir yang valid
+if ($totalHalaman > 0 && $halaman > $totalHalaman) {
+    $halaman = $totalHalaman;
+    $offset = ($halaman - 1) * $perHalaman;
+}
 
 // Ambil data mahasiswa beserta username-nya, difilter oleh kata kunci pencarian (NIM/Nama) jika ada
 $sql = "

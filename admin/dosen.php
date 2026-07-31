@@ -24,8 +24,10 @@ $offset = ($halaman - 1) * $perHalaman;
 $whereClause = '';
 $params = [];
 if ($keyword !== '') {
-    $whereClause = ' WHERE d.nidn LIKE :keyword OR d.nama LIKE :keyword';
-    $params[':keyword'] = '%' . $keyword . '%';
+    // Bug fix: nama parameter unik untuk setiap placeholder (lihat catatan di admin/mahasiswa.php)
+    $whereClause = ' WHERE d.nidn LIKE :keyword1 OR d.nama LIKE :keyword2';
+    $params[':keyword1'] = '%' . $keyword . '%';
+    $params[':keyword2'] = '%' . $keyword . '%';
 }
 
 $sqlCount = "SELECT COUNT(*) AS total FROM dosen d JOIN users u ON u.id = d.user_id" . $whereClause;
@@ -33,6 +35,11 @@ $stmtCount = $db->prepare($sqlCount);
 $stmtCount->execute($params);
 $totalData = (int) $stmtCount->fetch()['total'];
 $totalHalaman = (int) ceil($totalData / $perHalaman);
+
+if ($totalHalaman > 0 && $halaman > $totalHalaman) {
+    $halaman = $totalHalaman;
+    $offset = ($halaman - 1) * $perHalaman;
+}
 
 $sql = "
     SELECT d.id, d.nidn, d.nama, d.jenis_kelamin, d.no_hp, d.alamat, u.username
