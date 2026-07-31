@@ -25,4 +25,20 @@ document.addEventListener('DOMContentLoaded', function () {
       bsAlert.close();
     }, 5000);
   });
+
+  // Aktifkan validasi bawaan Bootstrap untuk semua form CRUD (modal tambah/edit, dsb)
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(function (form) {
+    form.addEventListener(
+      'submit',
+      function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      },
+      false
+    );
+  });
 });
