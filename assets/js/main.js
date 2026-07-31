@@ -10,10 +10,37 @@
 document.addEventListener('DOMContentLoaded', function () {
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebarMenu = document.getElementById('sidebarMenu');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-  if (sidebarToggle && sidebarMenu) {
+  function bukaSidebar() {
+    sidebarMenu.classList.remove('d-none');
+    sidebarBackdrop.classList.remove('d-none');
+  }
+
+  function tutupSidebar() {
+    sidebarMenu.classList.add('d-none');
+    sidebarBackdrop.classList.add('d-none');
+  }
+
+  if (sidebarToggle && sidebarMenu && sidebarBackdrop) {
     sidebarToggle.addEventListener('click', function () {
-      sidebarMenu.classList.toggle('d-none');
+      if (sidebarMenu.classList.contains('d-none')) {
+        bukaSidebar();
+      } else {
+        tutupSidebar();
+      }
+    });
+
+    // Tutup sidebar saat area gelap (backdrop) di-klik
+    sidebarBackdrop.addEventListener('click', tutupSidebar);
+
+    // Tutup sidebar otomatis saat salah satu menu diklik (khusus layar mobile)
+    sidebarMenu.querySelectorAll('a.nav-link').forEach(function (link) {
+      link.addEventListener('click', function () {
+        if (window.innerWidth < 992) {
+          tutupSidebar();
+        }
+      });
     });
   }
 

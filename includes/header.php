@@ -30,19 +30,20 @@ $pageTitle = $pageTitle ?? 'Dashboard';
 <body>
 <div class="d-flex">
     <?php require_once __DIR__ . '/sidebar.php'; ?>
+    <div class="sidebar-backdrop d-none" id="sidebarBackdrop"></div>
 
-    <div class="flex-grow-1">
+    <div class="flex-grow-1 main-content-wrapper">
         <!-- Navbar atas -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-3">
-            <button class="btn btn-outline-secondary d-lg-none me-2" type="button" id="sidebarToggle">
+            <button class="btn btn-outline-secondary d-lg-none me-2" type="button" id="sidebarToggle" aria-label="Buka menu">
                 <i class="bi bi-list"></i>
             </button>
-            <span class="navbar-brand fw-semibold mb-0"><?= htmlspecialchars($pageTitle) ?></span>
+            <span class="navbar-brand fw-semibold mb-0 text-truncate"><?= htmlspecialchars($pageTitle) ?></span>
 
             <div class="ms-auto dropdown">
                 <button class="btn btn-light d-flex align-items-center border" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-person-circle me-2"></i>
-                    <span><?= htmlspecialchars(currentUserName()) ?></span>
+                    <span class="d-none d-sm-inline"><?= htmlspecialchars(currentUserName()) ?></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><span class="dropdown-item-text small text-muted">Role: <?= htmlspecialchars(ucfirst($_SESSION['role'])) ?></span></li>
@@ -55,7 +56,7 @@ $pageTitle = $pageTitle ?? 'Dashboard';
             </div>
         </nav>
 
-        <main class="p-4">
+        <main class="p-3 p-md-4">
             <?php $flash = getFlash(); ?>
             <?php if ($flash): ?>
                 <div class="alert alert-<?= htmlspecialchars($flash['type']) ?> alert-dismissible alert-auto-dismiss" role="alert">
@@ -63,3 +64,4 @@ $pageTitle = $pageTitle ?? 'Dashboard';
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif; ?>
+
