@@ -1,0 +1,26 @@
+# =============================================================
+# .htaccess - Optimasi untuk Apache (XAMPP)
+# Mengaktifkan kompresi GZIP dan cache browser untuk aset statis
+# agar halaman dimuat lebih cepat, terutama saat memuat ulang
+# Bootstrap CSS/JS dan file CSS/JS milik aplikasi.
+# =============================================================
+
+# Kompresi GZIP untuk teks, CSS, JS, dan JSON
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+    AddOutputFilterByType DEFLATE application/javascript application/json
+</IfModule>
+
+# Cache browser untuk aset statis (gambar, css, js) selama 7 hari
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpg "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+# Nonaktifkan directory listing demi keamanan
+Options -Indexes

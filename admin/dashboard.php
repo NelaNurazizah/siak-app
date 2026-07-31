@@ -15,14 +15,26 @@ requireRole('admin');
 
 $db = Database::getConnection();
 
-// Ambil statistik jumlah data untuk setiap entitas
+// Optimasi: sebelumnya 6 query COUNT terpisah (6 round-trip ke database),
+// sekarang digabung menjadi 1 query dengan subquery agar lebih efisien.
+$stmtStats = $db->query('
+    SELECT
+        (SELECT COUNT(*) FROM mahasiswa)   AS total_mahasiswa,
+        (SELECT COUNT(*) FROM dosen)       AS total_dosen,
+        (SELECT COUNT(*) FROM mata_kuliah) AS total_mata_kuliah,
+        (SELECT COUNT(*) FROM kelas)       AS total_kelas,
+        (SELECT COUNT(*) FROM krs)         AS total_krs,
+        (SELECT COUNT(*) FROM nilai)       AS total_nilai
+');
+$hasilStats = $stmtStats->fetch();
+
 $stats = [
-    'mahasiswa'      => (int) $db->query('SELECT COUNT(*) AS total FROM mahasiswa')->fetch()['total'],
-    'dosen'          => (int) $db->query('SELECT COUNT(*) AS total FROM dosen')->fetch()['total'],
-    'mata_kuliah'    => (int) $db->query('SELECT COUNT(*) AS total FROM mata_kuliah')->fetch()['total'],
-    'kelas'          => (int) $db->query('SELECT COUNT(*) AS total FROM kelas')->fetch()['total'],
-    'krs'            => (int) $db->query('SELECT COUNT(*) AS total FROM krs')->fetch()['total'],
-    'nilai'          => (int) $db->query('SELECT COUNT(*) AS total FROM nilai')->fetch()['total'],
+    'mahasiswa'   => (int) $hasilStats['total_mahasiswa'],
+    'dosen'       => (int) $hasilStats['total_dosen'],
+    'mata_kuliah' => (int) $hasilStats['total_mata_kuliah'],
+    'kelas'       => (int) $hasilStats['total_kelas'],
+    'krs'         => (int) $hasilStats['total_krs'],
+    'nilai'       => (int) $hasilStats['total_nilai'],
 ];
 
 // Ambil tahun akademik yang sedang aktif

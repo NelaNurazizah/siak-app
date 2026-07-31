@@ -173,6 +173,31 @@ CREATE TABLE `nilai` (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =============================================================
+-- OPTIMASI: INDEX TAMBAHAN
+-- Kolom FK (user_id, mata_kuliah_id, dosen_id, dst.) sudah otomatis
+-- terindeks oleh MySQL saat FOREIGN KEY dibuat. Index di bawah ini
+-- ditambahkan khusus untuk mempercepat query yang sering dijalankan:
+-- pencarian (LIKE pada nama/kode) dan filter kombinasi kolom pada
+-- dashboard & laporan.
+-- =============================================================
+
+-- Mempercepat pencarian & pengurutan berdasarkan nama (dipakai di hampir semua halaman listing)
+ALTER TABLE `mahasiswa` ADD INDEX `idx_mahasiswa_nama` (`nama`);
+ALTER TABLE `dosen` ADD INDEX `idx_dosen_nama` (`nama`);
+ALTER TABLE `mata_kuliah` ADD INDEX `idx_matkul_nama` (`nama_mk`);
+
+-- Mempercepat query dashboard mahasiswa & isi KRS yang selalu memfilter
+-- berdasarkan kombinasi mahasiswa + tahun akademik
+ALTER TABLE `krs` ADD INDEX `idx_krs_mhs_tahun` (`mahasiswa_id`, `tahun_akademik_id`);
+
+-- Mempercepat query dashboard dosen yang memfilter kelas berdasarkan dosen + tahun akademik sekaligus
+-- (kolom dosen_id sendiri sudah terindeks otomatis oleh FK, tapi kombinasi ini mempercepat filter ganda)
+ALTER TABLE `kelas` ADD INDEX `idx_kelas_dosen_tahun` (`dosen_id`, `tahun_akademik_id`);
+
+-- Mempercepat query login (pencarian berdasarkan role, mis. saat menghitung jumlah admin)
+ALTER TABLE `users` ADD INDEX `idx_users_role` (`role`);
+
+-- =============================================================
 -- DATA DUMMY
 -- 1 Admin, 5 Dosen, 20 Mahasiswa, 10 Mata Kuliah, 5 Kelas,
 -- 3 Tahun Akademik, 100 KRS, 100 Nilai

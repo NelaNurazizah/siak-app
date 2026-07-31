@@ -25,19 +25,12 @@ $stmtKelas = $db->prepare('SELECT COUNT(*) AS total FROM kelas WHERE dosen_id = 
 $stmtKelas->execute([':dosen_id' => $dosenId]);
 $totalKelas = (int) $stmtKelas->fetch()['total'];
 
-// Jumlah mahasiswa unik yang mengambil kelas dosen ini (via KRS)
-$stmtMhs = $db->prepare('
-    SELECT COUNT(DISTINCT k.mahasiswa_id) AS total
-    FROM krs k
-    JOIN kelas kl ON kl.id = k.kelas_id
-    WHERE kl.dosen_id = :dosen_id
-');
-$stmtMhs->execute([':dosen_id' => $dosenId]);
-$totalMahasiswa = (int) $stmtMhs->fetch()['total'];
-
-// Progres input nilai: total KRS vs yang sudah dinilai
-$stmtProgres = $db->prepare('
+// Optimasi: jumlah mahasiswa unik dan progres nilai sama-sama berasal dari
+// tabel krs+kelas dengan filter dosen_id yang sama, jadi digabung jadi 1 query
+// (sebelumnya 2 query terpisah).
+$stmtRingkasan = $db->prepare('
     SELECT
+        COUNT(DISTINCT k.mahasiswa_id) AS total_mahasiswa,
         COUNT(k.id) AS total_krs,
         SUM(CASE WHEN n.id IS NOT NULL THEN 1 ELSE 0 END) AS sudah_dinilai
     FROM krs k
@@ -45,10 +38,12 @@ $stmtProgres = $db->prepare('
     LEFT JOIN nilai n ON n.krs_id = k.id
     WHERE kl.dosen_id = :dosen_id
 ');
-$stmtProgres->execute([':dosen_id' => $dosenId]);
-$progres = $stmtProgres->fetch();
-$totalKrs = (int) ($progres['total_krs'] ?? 0);
-$sudahDinilai = (int) ($progres['sudah_dinilai'] ?? 0);
+$stmtRingkasan->execute([':dosen_id' => $dosenId]);
+$ringkasan = $stmtRingkasan->fetch();
+
+$totalMahasiswa = (int) ($ringkasan['total_mahasiswa'] ?? 0);
+$totalKrs = (int) ($ringkasan['total_krs'] ?? 0);
+$sudahDinilai = (int) ($ringkasan['sudah_dinilai'] ?? 0);
 $belumDinilai = $totalKrs - $sudahDinilai;
 $persenProgres = $totalKrs > 0 ? round(($sudahDinilai / $totalKrs) * 100) : 0;
 
