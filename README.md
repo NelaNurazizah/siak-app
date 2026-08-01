@@ -42,7 +42,7 @@ Proyek UAS Pemrograman Internet — Sistem Informasi Akademik (SIA) sederhana be
 ## 📁 Struktur Folder
 
 ```
-uas-sia/
+siak-app/
 ├── assets/
 │   ├── css/            # File CSS kustom (style.css)
 │   ├── js/             # File JavaScript (main.js, login.js)
@@ -222,8 +222,8 @@ flowchart TD
 1. Pastikan **XAMPP** (Apache + MySQL + PHP 8.1+) sudah terpasang di komputer Anda.
 2. Clone atau salin seluruh folder proyek ini ke dalam folder `htdocs` XAMPP, contoh:
    ```
-   C:\xampp\htdocs\uas-sia\        (Windows)
-   /Applications/XAMPP/htdocs/uas-sia/   (Mac)
+   C:\xampp\htdocs\siak-app\        (Windows)
+   /Applications/XAMPP/htdocs/siak-app/   (Mac)
    ```
 3. Buka XAMPP Control Panel, jalankan service **Apache** dan **MySQL**.
 
@@ -243,7 +243,7 @@ flowchart TD
 1. Pastikan konfigurasi database di `config/database.php` sesuai dengan environment Anda (default: host `localhost`, user `root`, password kosong — sesuai default XAMPP).
 2. Buka browser, akses:
    ```
-   http://localhost/uas-sia/
+   http://localhost/siak-app/
    ```
 3. Anda akan diarahkan otomatis ke halaman login.
 4. Login menggunakan salah satu [akun default](#-akun-default) di bawah.

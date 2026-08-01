@@ -48,8 +48,9 @@ try {
     $stmt->execute([':username' => $username]);
     $user = $stmt->fetch();
 
-    // Verifikasi password dengan password_verify()
-    if (!$user || !password_verify($password, $user['password'])) {
+
+    // Verifikasi password plaintext
+    if (!$user || $password !== $user['password']) {
         $_SESSION['login_error'] = 'Username atau password salah.';
         header('Location: ' . BASE_URL . 'login.php');
         exit;

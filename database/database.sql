@@ -205,34 +205,34 @@ ALTER TABLE `users` ADD INDEX `idx_users_role` (`role`);
 -- =========================================================
 -- DUMMY DATA: USERS
 -- Semua password dummy = 'password123' (sudah di-hash bcrypt)
--- Hash: $2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G
+-- Hash: $2y$10$G0qIn8r0mfquUhPdtCEQwej6anlh0H9B/BpxXUyRjXe4Ox5L6ZEO.
 -- =========================================================
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (1, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'admin');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (2, 'dosen1', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'dosen');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (3, 'dosen2', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'dosen');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (4, 'dosen3', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'dosen');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (5, 'dosen4', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'dosen');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (6, 'dosen5', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'dosen');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (7, '20230001', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (8, '20230002', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (9, '20230003', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (10, '20230004', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (11, '20230005', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (12, '20230006', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (13, '20230007', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (14, '20230008', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (15, '20230009', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (16, '20230010', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (17, '20230011', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (18, '20230012', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (19, '20230013', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (20, '20230014', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (21, '20230015', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (22, '20230016', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (23, '20230017', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (24, '20230018', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (25, '20230019', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
-INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (26, '20230020', '$2y$10$92IXUNpkjO0rOQ5byMi.YeYS2t.n34x7ykr9jUj3n6d5X1w4z9j0G', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (1, 'admin', 'password123', 'admin');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (2, 'dosen1', 'password123', 'dosen');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (3, 'dosen2', 'password123', 'dosen');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (4, 'dosen3', 'password123', 'dosen');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (5, 'dosen4', 'password123', 'dosen');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (6, 'dosen5', 'password123', 'dosen');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (7, '20230001', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (8, '20230002', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (9, '20230003', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (10, '20230004', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (11, '20230005', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (12, '20230006', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (13, '20230007', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (14, '20230008', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (15, '20230009', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (16, '20230010', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (17, '20230011', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (18, '20230012', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (19, '20230013', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (20, '20230014', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (21, '20230015', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (22, '20230016', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (23, '20230017', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (24, '20230018', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (25, '20230019', 'password123', 'mahasiswa');
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES (26, '20230020', 'password123', 'mahasiswa');
 
 -- =========================================================
 -- DUMMY DATA: ADMIN

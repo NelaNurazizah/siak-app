@@ -34,7 +34,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Base URL aplikasi (sesuaikan dengan folder project di htdocs XAMPP)
-define('BASE_URL', '/uas-sia/');
+define('BASE_URL', '/siak-app/');
 
 // Nama aplikasi
 define('APP_NAME', 'Sistem Informasi Akademik');
